@@ -7,6 +7,10 @@ const notebookController = require("../Controllers/notebookController");
 
 //GET request
 
+router.get("/", notebookController.getNotebooks, (req, res) =>
+  res.status(200).json(res.locals)
+);
+
 //POST request
 
 //PUT request
