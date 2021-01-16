@@ -1,10 +1,11 @@
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 //connection uri
-const PG_URI = "postgres://dsztlzvw:3P5bwAfvoIFDgpcjBA6r_QG8QV7Vtz79@ziggy.db.elephantsql.com:5432/dsztlzvw";
+const PG_URI =
+  "postgres://dsztlzvw:3P5bwAfvoIFDgpcjBA6r_QG8QV7Vtz79@ziggy.db.elephantsql.com:5432/dsztlzvw";
 
 // create a new pool here using the connection string above
 const pool = new Pool({
-  connectionString: PG_URI
+  connectionString: PG_URI,
 });
 
 // Adding some notes about the database here will be helpful for future you or other developers.
@@ -16,12 +17,11 @@ const pool = new Pool({
 // This will be required in the controllers to be the access point to the database
 module.exports = {
   query: (text, params, callback) => {
-    console.log('executed query', text);
+    console.log("executed query", text);
     return pool.query(text, params, callback);
-  }
+  },
 };
 
-
 //Command to run in terminal to create sql tables to elephant sql
-//psql command: -- psql -d postgres://dsztlzvw:3P5bwAfvoIFDgpcjBA6r_QG8QV7Vtz79@ziggy.db.elephantsql.com:5432/dsztlzvw -f tables.sql
-
+// psql command:
+// psql -d postgres://dsztlzvw:3P5bwAfvoIFDgpcjBA6r_QG8QV7Vtz79@ziggy.db.elephantsql.com:5432/dsztlzvw -f tables.sql
