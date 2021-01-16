@@ -27,14 +27,31 @@ class App extends Component {
     };
   }
 
+  // path={`${match.path}/:topicId`}>
+  // matchPath("/users/2", {
+  //   path: "/users/:id",
+  //   exact: true,
+  //   strict: true
+  // });
+
   render() {
     const generateLinks = this.state.navigation.map((notebook) => {
       const { _id: id, _id: reactKey, name } = notebook;
-
+      console.log(id, name);
       return (
         <li key={reactKey}>
-          <Link to="/{name}}">{name}</Link>
+          <Link to={`/${id}`}>{name}</Link>
         </li>
+      );
+    });
+
+    const generateNotebookRoutes = this.state.navigation.map((notebook) => {
+      const { _id: id, _id: reactKey, name } = notebook;
+
+      return (
+        <Route key={reactKey} path={`/${id}`}>
+          <h1>{name}</h1>
+        </Route>
       );
     });
 
@@ -49,12 +66,7 @@ class App extends Component {
           </ul>
         </nav>
         <Switch>
-          <Route path="/notebook1">
-            <h1>placeholder for notebook1</h1>
-          </Route>
-          <Route path="/notebook2">
-            <h1>placeholder for notebook2</h1>
-          </Route>
+          {generateNotebookRoutes}
           <Route path="/">
             <Home />
           </Route>
