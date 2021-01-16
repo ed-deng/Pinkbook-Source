@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   // Mode will be set when running script
@@ -8,34 +8,33 @@ module.exports = {
   entry: path.join(__dirname, './client/index.js'),
 
   output: {
-    path: path.join(__dirname, "build"),
-    filename: "bundle.js",
+    path: path.join(__dirname, 'build'),
+    filename: 'bundle.js',
   },
   devServer: {
-    publicPath: "/build/", // tells webpack where to put bundle.js
-    // proxy: {
-    //   "/": "http://localhost:5000",
-    //   '/api': 'http://localhost:3000',
-    // },
+    publicPath: '/build/', // tells webpack where to put bundle.js
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
     hot: true,
   },
-  
+
   module: {
     rules: [
       {
         test: /\.jsx?/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+            presets: ['@babel/preset-env', '@babel/preset-react'],
           },
         },
       },
 
       {
         test: /\.(scss|css)$/,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
     ],
   },
