@@ -1,15 +1,17 @@
 // Import Modules
-const express = require('express');
-const fs = require('fs'); 
-const path = require('path'); 
-const cors = require('cors');
-const helmet = require('helmet');
-const bodyParser = require('body-parser');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+const cors = require("cors");
+const helmet = require("helmet");
+const bodyParser = require("body-parser");
 
 // require('dotenv').config();
 
+const apiRouter = require("./Routes/api");
+
 // Invoke modules
-const app = express(); 
+const app = express();
 const port = process.env.PORT || 3000;
 app.use(helmet());
 app.use(cors());
@@ -29,11 +31,14 @@ app.use((req, res, next) => {
 });
 
 // Hosting static files
-app.use('/build', express.static(path.join(__dirname, '../build')));
+app.use("/build", express.static(path.join(__dirname, "../build")));
+
+//sending backing requests to router
+app.use("/api", apiRouter);
 
 // Send homepage - Optional?
-app.get('/', (req, res) => {
-  return res.status(200).sendFile(path.join(__dirname, '../index.html'));
+app.get("/", (req, res) => {
+  return res.status(200).sendFile(path.join(__dirname, "../index.html"));
 });
 
 // Route to handle 404 errors
@@ -51,4 +56,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Port is listening to ${port}`);
 });
-
