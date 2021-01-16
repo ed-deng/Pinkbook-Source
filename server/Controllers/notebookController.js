@@ -2,15 +2,6 @@ const db = require("../Models/pinkbooksql.js");
 
 const notebookController = {};
 
-console.log("test");
-console.log("test");
-console.log("test");
-console.log("test");
-console.log("test");
-console.log("test");
-console.log("test");
-console.log("test");
-
 //Get all notebooks
 
 notebookController.getNotebooks = (req, res, next) => {
@@ -21,7 +12,7 @@ notebookController.getNotebooks = (req, res, next) => {
       return next(error);
     }
     res.locals = response.rows;
-    next();
+    return next();
   });
 };
 
@@ -42,13 +33,13 @@ notebookController.addNotebook = (req, res, next) => {
     ],
   };
 
-  db.query(addNotebookSQL, notebookInfo, (error, response) => {
+  db.query(addNotebookSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
     }
     res.locals = response.rows[0];
-    next();
+    return next();
   });
 };
 
@@ -56,9 +47,10 @@ notebookController.addNotebook = (req, res, next) => {
 notebookController.updateNotebook = (req, res, next) => {
   const updateNotebookSQL = {
     text:
-      "UPDATE notebook SET (_id, name, description, date_updated, shared_with) = ($1, $2, $3, $4, $5) WHERE _id = $6 ",
+      "UPDATE notebook SET (_id, name, description, date_updated, shared_with) = ($1, $2, $3, $4, $5) WHERE _id = $1 ",
     values: [
       req.body._id,
+      req.body.name,
       req.body.description,
       req.body.date_updated,
       req.body.shared_with,
@@ -70,7 +62,8 @@ notebookController.updateNotebook = (req, res, next) => {
       console.log(error);
       return next(error);
     }
-    return next;
+    res.locals.updateNotebook = response.rows[0];
+    return next();
   });
 };
 
@@ -78,9 +71,15 @@ notebookController.updateNotebook = (req, res, next) => {
 notebookController.deleteNotebook = (req, res, next) => {
   const deleteNotebookSQL = {
     text: "DELETE FROM notebook WHERE _id = ($1)",
-    values: [req.params._id],
+    values: [req.body._id],
   };
-  db.query(deleteNotebookSQL, (error, response) => {});
+  db.query(deleteNotebookSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(err);
+    }
+    return next();
+  });
 };
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -109,4 +108,4 @@ notebookController.deleteNotebook = (req, res, next) => {
 
 //Delete reminders
 
-notebookController.module.exports = notebookController;
+module.exports = notebookController;

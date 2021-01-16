@@ -13,8 +13,18 @@ router.get("/", notebookController.getNotebooks, (req, res) =>
 
 //POST request
 
-//PUT request
+router.post("/", notebookController.addNotebook, (req, res) =>
+  res.status(200).json(res.locals)
+);
 
+//PUT request
+router.put("/:id", notebookController.updateNotebook, (req, res) => {
+  res.status(200).json(res.locals.updateNotebook);
+});
 //DELETE request
+
+router.delete("/:id", notebookController.deleteNotebook, (req, res) =>
+  res.status(200).json({ msg: "deleted succesfully" })
+);
 
 module.exports = router;
