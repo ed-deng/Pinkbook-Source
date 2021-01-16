@@ -1,4 +1,4 @@
-const db = require("../Models/pinkbooksql.js");
+const db = require('../Models/pinkbooksql.js');
 
 const notebookController = {};
 
