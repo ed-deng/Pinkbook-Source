@@ -25,3 +25,9 @@ module.exports = {
 //Command to run in terminal to create sql tables to elephant sql
 // psql command:
 // psql -d postgres://dsztlzvw:3P5bwAfvoIFDgpcjBA6r_QG8QV7Vtz79@ziggy.db.elephantsql.com:5432/dsztlzvw -f tables.sql
+
+// INSERT INTO SKILLS VALUES (1, 14, 'testSkills', 4)
+
+// INSERT INTO NOTES VALUES (1, 14, 'this is a textbox', '2020-01-17', 2, '2020-01-17', 'Joe, Ed')
+
+// INSERT INTO REMINDERS VALUES (1, 14, 'testSkills', '2020-01-17', '12:23' )

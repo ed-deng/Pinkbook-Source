@@ -1,3 +1,4 @@
+const { response } = require("express");
 const db = require("../Models/pinkbooksql.js");
 
 const notebookController = {};
@@ -86,28 +87,207 @@ notebookController.deleteNotebook = (req, res, next) => {
 
 //Get all Notes, Skills, Reminders
 
-notebookController.allComponents = (req, res, next) => {};
+notebookController.allComponents = (req, res, next) => {
+  const allComponentsSQL =
+    "SELECT notes._id as notes_id, notes.notebook_id, notes.textbox as notes_textbox, notes.date_created as notes_date_created,  notes.page_number, notes.shared_with, skills._id as skill_id, skills.name as skill_name, skills.rating as skill_rating, reminders.description as reminder_description, reminders.date_created as reminders_date_created, reminders.time as reminder_time FROM notes LEFT OUTER JOIN skills ON notes.notebook_id = skills.notebook_id LEFT OUTER JOIN reminders ON notes.notebook_id = reminders.notebook_id";
+
+  db.query(allComponentsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows;
+    return next();
+  });
+};
 
 //Add notes
-
+notebookController.addNotes = (req, res, next) => {
+  const addNotesSQL = {
+    text:
+      "INSERT INTO notes (_id, notebook_id, textbox, date_created, page_number,date_updated, shared_with) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+    values: [
+      req.body._id,
+      req.body.notebook_id,
+      req.body.textbox,
+      req.body.date_created,
+      req.body.page_number,
+      req.body.date_updated,
+      req.body.shared_with,
+    ],
+  };
+  db.query(addNotesSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows[0];
+    return next();
+  });
+};
 //Update notes
 
+notebookController.updateNotes = (req, res, next) => {
+  const updateNotesSQL = {
+    text:
+      "UPDATE notes SET (_id, textbox, date_created, page_number, date_updated, shared_with) = ($1, $2, $3, $4, $5, $6) WHERE _id = $1 RETURNING *",
+    values: [
+      req.params.id,
+      req.body.textbox,
+      req.body.date_created,
+      req.body.page_number,
+      req.body.date_updated,
+      req.body.shared_with,
+    ],
+  };
+  db.query(updateNotesSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals.updateNotebook = response.rows[0];
+    return next();
+  });
+};
+
 //Delete notes
+
+notebookController.deleteNotes = (req, res, next) => {
+  const deleteNotesSQL = {
+    text: "DELETE FROM notes WHERE _id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteNotesSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(err);
+    }
+    return next();
+  });
+};
 
 //---------------------------------------------------------------------------------------------------------------------------------
 
 //Add skills
+notebookController.addSkills = (req, res, next) => {
+  const addSkillsSQL = {
+    text:
+      "INSERT INTO skills (_id, notebook_id, name, rating) VALUES ($1, $2, $3, $4)",
+    values: [
+      req.body._id,
+      req.body.notebook_id,
+      req.body.name,
+      req.body.rating,
+    ],
+  };
+  db.query(addSkillsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows[0];
+    return next();
+  });
+};
 
 //Update skills
+notebookController.updateSkills = (req, res, next) => {
+  const updateSkillsSQL = {
+    text:
+      "UPDATE SKILLS SET (_id, notebook_id, name, rating) = ($1, $2, $3, $4) WHERE _id = $1 RETURNING *",
+    values: [
+      req.body._id,
+      req.body.notebook_id,
+      req.body.name,
+      req.body.rating,
+    ],
+  };
+  db.query(updateSkillsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals.updateSkills = response.rows[0];
+    return next();
+  });
+};
 
 //Delete notebook
+notebookController.deleteSkills = (req, res, next) => {
+  const deleteSkillsSQL = {
+    text: "DELETE FROM skills WHERE _id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteSkillsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    return next();
+  });
+};
 
 //---------------------------------------------------------------------------------------------------------------------------------
 
 //Add reminders
 
-//Update reminders
+notebookController.addReminders = (req, res, next) => {
+  const addRemindersSQL = {
+    text:
+      "INSERT INTO reminders (_id, notebook_id, description, date_created, time) VALUES ($1, $2, $3, $4, $5)",
+    values: [
+      req.body._id,
+      req.body.notebook_id,
+      req.body.description,
+      req.body.date_created,
+      req.body.time,
+    ],
+  };
+  db.query(addRemindersSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows[0];
+    return next();
+  });
+};
 
+//Update reminders
+notebookController.updateReminders = (req, res, next) => {
+  const updateRemindersSQL = {
+    text:
+      "UPDATE REMINDERS SET (_id, notebook_id, description, date_created, time) = ($1, $2, $3, $4, $5) WHERE _id = $1",
+    values: [
+      req.body._id,
+      req.body.notebook_id,
+      req.body.description,
+      req.body.date_created,
+      req.body.time,
+    ],
+  };
+  db.query(updateRemindersSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals.updateReminders = response.rows[0];
+    return next();
+  });
+};
 //Delete reminders
+notebookController.deleteReminders = (req, res, next) => {
+  const deleteRemindersSQL = {
+    text: "DELETE FROM reminders WHERE _id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteRemindersSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    return next();
+  });
+};
 
 module.exports = notebookController;
