@@ -37,7 +37,7 @@ app.use("/build", express.static(path.join(__dirname, "../build")));
 app.use("/api", apiRouter);
 
 // Send homepage - Optional?
-app.get("/", (req, res) => {
+app.get("/*", (req, res) => {
   return res.status(200).sendFile(path.join(__dirname, "../index.html"));
 });
 

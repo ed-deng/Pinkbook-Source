@@ -21,9 +21,8 @@ notebookController.getNotebooks = (req, res, next) => {
 notebookController.addNotebook = (req, res, next) => {
   const addNotebookSQL = {
     text:
-      "INSERT INTO notebook (_id, name, description, date_created, page_number, date_updated, shared_with) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO notebook (name, description, date_created, page_number, date_updated, shared_with) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
     values: [
-      req.body["_id"],
       req.body.name,
       req.body.description,
       req.body["date_created"],
@@ -38,6 +37,7 @@ notebookController.addNotebook = (req, res, next) => {
       console.log(error);
       return next(error);
     }
+    console.log(response);
     res.locals = response.rows[0];
     return next();
   });
@@ -47,9 +47,9 @@ notebookController.addNotebook = (req, res, next) => {
 notebookController.updateNotebook = (req, res, next) => {
   const updateNotebookSQL = {
     text:
-      "UPDATE notebook SET (_id, name, description, date_updated, shared_with) = ($1, $2, $3, $4, $5) WHERE _id = $1 ",
+      "UPDATE notebook SET (_id, name, description, date_updated, shared_with) = ($1, $2, $3, $4, $5) WHERE _id = $1 RETURNING *",
     values: [
-      req.body._id,
+      req.params.id,
       req.body.name,
       req.body.description,
       req.body.date_updated,
@@ -71,7 +71,7 @@ notebookController.updateNotebook = (req, res, next) => {
 notebookController.deleteNotebook = (req, res, next) => {
   const deleteNotebookSQL = {
     text: "DELETE FROM notebook WHERE _id = ($1)",
-    values: [req.body._id],
+    values: [req.params.id],
   };
   db.query(deleteNotebookSQL, (error, response) => {
     if (error) {
@@ -85,6 +85,8 @@ notebookController.deleteNotebook = (req, res, next) => {
 //---------------------------------------------------------------------------------------------------------------------------------
 
 //Get all Notes, Skills, Reminders
+
+notebookController.allComponents = (req, res, next) => {};
 
 //Add notes
 
