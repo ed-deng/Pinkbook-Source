@@ -1,20 +1,20 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   // Mode will be set when running script
   mode: process.env.NODE_ENV,
 
   // An entry point indicates which module webpack should use to begin building out its internal dependency graph.
-  entry: path.join(__dirname, './client/index.js'),
+  entry: path.join(__dirname, "./client/index.js"),
 
   output: {
-    path: path.join(__dirname, 'build'),
-    filename: 'bundle.js',
+    path: path.join(__dirname, "build"),
+    filename: "bundle.js",
   },
   devServer: {
-    publicPath: '/build/', // tells webpack where to put bundle.js
+    publicPath: "/build/", // tells webpack where to put bundle.js
     proxy: {
-      '/api': 'http://localhost:3000',
+      "/api": "http://localhost:3000",
     },
     hot: true,
   },
@@ -25,16 +25,16 @@ module.exports = {
         test: /\.jsx?/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: ["@babel/preset-env", "@babel/preset-react"],
           },
         },
       },
 
       {
         test: /\.(scss|css)$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
