@@ -20,12 +20,11 @@ class App extends Component {
   deleteSkillsCard(events, id) {
     console.log(events);
     console.log(id);
-
   }
 
   componentDidMount() {
     //fetches all information on all notebooks
-    fetch('/api/all')
+    fetch('/api/')
       .then((res) => res.json())
       .then((data) => this.setState({ notebookList: data }));
   }
@@ -51,7 +50,6 @@ class App extends Component {
         reminders,
         notes,
       } = notebook;
-
 
       return (
         <Route key={reactKey} path={`/${id}`}>
