@@ -221,7 +221,7 @@ notebookController.notebookDetails = (req, res, next) => {
 
 notebookController.notesDetails = (req, res, next) => {
   const noteDetailsSQL =
-    "SELECT notes.textbox as textbox, notes.notebook_id as notebook_id FROM notes";
+    "SELECT notes._id as _id, notes.textbox as textbox, notes.notebook_id as notebook_id FROM notes";
 
   db.query(noteDetailsSQL, (error, response) => {
     if (error) {
@@ -239,6 +239,7 @@ notebookController.notesDetails = (req, res, next) => {
           //assign notes property to that given notebook as object with a textbook property and value from the notesObject
           notebook.notes = {
             textbox: notesObject.textbox,
+            _id: notesObject._id,
           };
         }
       });
@@ -249,7 +250,7 @@ notebookController.notesDetails = (req, res, next) => {
 
 notebookController.skillsDetails = (req, res, next) => {
   const skillsDetailsSQL =
-    "SELECT skills.notebook_id, skills.name, skills.rating FROM skills ";
+    "SELECT skills.notebook_id, skills.name, skills.rating, skills._id FROM skills ";
 
   db.query(skillsDetailsSQL, (error, response) => {
     if (error) {
@@ -273,6 +274,7 @@ notebookController.skillsDetails = (req, res, next) => {
           notebook.skills.push({
             name: skillsObject.name,
             rating: skillsObject.rating,
+            _id: skillsObject._id,
           });
         }
       });
@@ -284,7 +286,7 @@ notebookController.skillsDetails = (req, res, next) => {
 
 notebookController.remindersDetails = (req, res, next) => {
   const remindersDetailsSQL =
-    "SELECT reminders.notebook_id as notebook_id, reminders.description as reminders_description, reminders.time as reminders_time FROM reminders";
+    "SELECT reminders._id as _id, reminders.notebook_id as notebook_id, reminders.description as reminders_description, reminders.time as reminders_time FROM reminders";
 
   db.query(remindersDetailsSQL, (error, response) => {
     if (error) {
@@ -302,6 +304,7 @@ notebookController.remindersDetails = (req, res, next) => {
           notebook.reminders.push({
             description: reminderObject.reminders_description,
             time: reminderObject.reminders_time,
+            _id: reminderObject._id,
           });
         }
       });
