@@ -41,7 +41,6 @@ notebookController.addNotebook = (req, res, next) => {
       console.log(error);
       return next(error);
     }
-    console.log(response);
     res.locals = response.rows[0];
     return next();
   });
@@ -50,15 +49,15 @@ notebookController.addNotebook = (req, res, next) => {
 //Adding notes when adding a new notebook
 notebookController.addNotesForAddingNotebook = (req, res, next) => {
   const addNotesSQL = {
-    text: "INSERT INTO notes (notebook_id) VALUES ($1)",
-    values: [req.body._id],
+    text: "INSERT INTO notes (notebook_id, textbox) VALUES ($1, $2)",
+    values: [req.body._id, ""],
   };
   db.query(addNotesSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
     }
-    res.locals = response.rows[0];
+    res.locals.notes = [response.rows[0]];
     return next();
   });
 };
@@ -66,15 +65,15 @@ notebookController.addNotesForAddingNotebook = (req, res, next) => {
 //Adding skills when adding a new notebook
 notebookController.addSkillsForAddingNotebook = (req, res, next) => {
   const addSkillsForAddingNotebookSQL = {
-    text: "INSERT INTO skills (notebook_id) VALUES ($1)",
-    values: [req.body._id],
+    text: "INSERT INTO skills (notebook_id, name, rating) VALUES ($1, $2, $3)",
+    values: [req.body._id, "", 0],
   };
   db.query(addSkillsForAddingNotebookSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
     }
-    res.locals = response.rows[0];
+    res.locals.skills = [response.rows[0]];
     return next();
   });
 };
@@ -82,15 +81,16 @@ notebookController.addSkillsForAddingNotebook = (req, res, next) => {
 //Adding reminders when adding a new notebook
 notebookController.addRemindersForAddingNotebook = (req, res, next) => {
   const addRemindersSQL = {
-    text: "INSERT INTO reminders (notebook_id) VALUES ($1)",
-    values: [req.body._id],
+    text:
+      "INSERT INTO reminders (notebook_id, description, time) VALUES ($1, $2, $3)",
+    values: [req.body._id, "", ""],
   };
   db.query(addRemindersSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
     }
-    res.locals = response.rows[0];
+    res.locals.reminders = [response.rows[0]];
     return next();
   });
 };
@@ -184,18 +184,131 @@ notebookController.deleteRemindersForDeletingNotebook = (req, res, next) => {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 
-//Get all Notes, Skills, Reminders
+//Get all NotebookNotes, Skills, Reminders info into one res.locals that can be fetched from the frontend to populate components
+//EXAMPLE of what that would look like:
+// [
+//   {
+//       "notebook_id": test,
+//       "notebook_name": "Test",
+//       "notebook_description": "Remove id",
+//       "notebook_date_created": "1-18-2021",
+//       "notebook_shared_with": "Joe Ed",
+//       "skills": [{
+//         'name': 'testName',
+//         'rating': 'rating'
+//       }],
+//       "reminders": [{
+//         "description": 'test description',
+//         'time': 'test time'
+//       }]
+//   },
+// ]
 
-notebookController.allComponents = (req, res, next) => {
-  const allComponentsSQL =
-    "SELECT notes._id as notes_id, notes.notebook_id, notes.textbox as notes_textbox, notes.date_created as notes_date_created,  notes.page_number, notes.shared_with, skills._id as skill_id, skills.name as skill_name, skills.rating as skill_rating, reminders.description as reminder_description, reminders.date_created as reminders_date_created, reminders.time as reminder_time FROM notes LEFT OUTER JOIN skills ON notes.notebook_id = skills.notebook_id LEFT OUTER JOIN reminders ON notes.notebook_id = reminders.notebook_id";
+notebookController.notebookDetails = (req, res, next) => {
+  const notebookDetailsSQL =
+    "SELECT notebook._id as notebook_id, notebook.name as notebook_name, notebook.description as notebook_description, notebook.date_created as notebook_date_created, notebook.shared_with as notebook_shared_with from Notebook ";
 
-  db.query(allComponentsSQL, (error, response) => {
+  db.query(notebookDetailsSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
     }
+    //adding in initial notebook data to the res.locals
     res.locals = response.rows;
+    return next();
+  });
+};
+
+notebookController.notesDetails = (req, res, next) => {
+  const noteDetailsSQL =
+    "SELECT notes._id as _id, notes.textbox as textbox, notes.notebook_id as notebook_id FROM notes";
+
+  db.query(noteDetailsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+
+    //add a notes property to each notebook object and populate with data from notes table
+    //set up our outer loop
+    res.locals.forEach((notebook) => {
+      //set up inner loop
+      response.rows.forEach((notesObject) => {
+        //match up notebook_id in notebooks and notebook_id in notesObject
+        if (notebook.notebook_id === Number(notesObject.notebook_id)) {
+          //assign notes property to that given notebook as object with a textbook property and value from the notesObject
+          notebook.notes = {
+            textbox: notesObject.textbox,
+            _id: notesObject._id,
+          };
+        }
+      });
+    });
+    return next();
+  });
+};
+
+notebookController.skillsDetails = (req, res, next) => {
+  const skillsDetailsSQL =
+    "SELECT skills.notebook_id, skills.name, skills.rating, skills._id FROM skills ";
+
+  db.query(skillsDetailsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    //add a skills property to each notebook object
+    res.locals.forEach((notebook) => {
+      notebook.skills = [];
+    });
+
+    //populate each skills property on each object with info from skills table
+
+    //loop over each notebook
+    res.locals.forEach((notebook) => {
+      //loop over each skills object in response
+      response.rows.forEach((skillsObject) => {
+        //check if the notebooks match with the skillsObject
+        if (notebook.notebook_id === Number(skillsObject.notebook_id)) {
+          //if they do, then push in an object for each skill with its rating and name
+          notebook.skills.push({
+            name: skillsObject.name,
+            rating: skillsObject.rating,
+            _id: skillsObject._id,
+          });
+        }
+      });
+    });
+
+    return next();
+  });
+};
+
+notebookController.remindersDetails = (req, res, next) => {
+  const remindersDetailsSQL =
+    "SELECT reminders._id as _id, reminders.notebook_id as notebook_id, reminders.description as reminders_description, reminders.time as reminders_time FROM reminders";
+
+  db.query(remindersDetailsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    //add a reminders property to each notebook object
+    res.locals.forEach((notebook) => {
+      notebook.reminders = [];
+    });
+    //populate each reminder property on each object with info from reminders table
+    res.locals.forEach((notebook) => {
+      response.rows.forEach((reminderObject) => {
+        if (notebook.notebook_id === Number(reminderObject.notebook_id)) {
+          notebook.reminders.push({
+            description: reminderObject.reminders_description,
+            time: reminderObject.reminders_time,
+            _id: reminderObject._id,
+          });
+        }
+      });
+    });
     return next();
   });
 };
@@ -295,7 +408,7 @@ notebookController.updateSkills = (req, res, next) => {
     text:
       "UPDATE SKILLS SET (_id, notebook_id, name, rating) = ($1, $2, $3, $4) WHERE _id = $1 RETURNING *",
     values: [
-      req.body._id,
+      req.params.id,
       req.body.notebook_id,
       req.body.name,
       req.body.rating,
@@ -358,7 +471,7 @@ notebookController.updateReminders = (req, res, next) => {
     text:
       "UPDATE REMINDERS SET (_id, notebook_id, description, date_created, time) = ($1, $2, $3, $4, $5) WHERE _id = $1",
     values: [
-      req.body._id,
+      req.params.id,
       req.body.notebook_id,
       req.body.description,
       req.body.date_created,
