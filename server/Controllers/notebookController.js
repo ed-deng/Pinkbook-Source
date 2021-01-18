@@ -17,13 +17,16 @@ notebookController.getNotebooks = (req, res, next) => {
   });
 };
 
-//Add notebooks
+//When adding a new notebook, we also add in a new row into our notes, reminders, and skills tables
+//to ensure that those components will render on the page after adding in a new notebook
 
+//Add notebooks
 notebookController.addNotebook = (req, res, next) => {
   const addNotebookSQL = {
     text:
-      "INSERT INTO notebook (name, description, date_created, page_number, date_updated, shared_with) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      "INSERT INTO notebook (_id, name, description, date_created, page_number, date_updated, shared_with) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
     values: [
+      req.body._id,
       req.body.name,
       req.body.description,
       req.body["date_created"],
@@ -39,6 +42,54 @@ notebookController.addNotebook = (req, res, next) => {
       return next(error);
     }
     console.log(response);
+    res.locals = response.rows[0];
+    return next();
+  });
+};
+
+//Adding notes when adding a new notebook
+notebookController.addNotesForAddingNotebook = (req, res, next) => {
+  const addNotesSQL = {
+    text: "INSERT INTO notes (notebook_id) VALUES ($1)",
+    values: [req.body._id],
+  };
+  db.query(addNotesSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows[0];
+    return next();
+  });
+};
+
+//Adding skills when adding a new notebook
+notebookController.addSkillsForAddingNotebook = (req, res, next) => {
+  const addSkillsForAddingNotebookSQL = {
+    text: "INSERT INTO skills (notebook_id) VALUES ($1)",
+    values: [req.body._id],
+  };
+  db.query(addSkillsForAddingNotebookSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    res.locals = response.rows[0];
+    return next();
+  });
+};
+
+//Adding reminders when adding a new notebook
+notebookController.addRemindersForAddingNotebook = (req, res, next) => {
+  const addRemindersSQL = {
+    text: "INSERT INTO reminders (notebook_id) VALUES ($1)",
+    values: [req.body._id],
+  };
+  db.query(addRemindersSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
     res.locals = response.rows[0];
     return next();
   });
@@ -68,13 +119,61 @@ notebookController.updateNotebook = (req, res, next) => {
   });
 };
 
-//Delete notebooks
+//When deleting a notebook, we also need to make sure to remove any corresponding rows
+//from our notes, reminders and skills tables that are related to that notebook
+
+//Delete notebooks part 4, deleting actual notebook
 notebookController.deleteNotebook = (req, res, next) => {
   const deleteNotebookSQL = {
     text: "DELETE FROM notebook WHERE _id = ($1)",
     values: [req.params.id],
   };
   db.query(deleteNotebookSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    return next();
+  });
+};
+
+//Delete corresponding notes when deleting a notebook
+notebookController.deleteNotesForDeletingNotebook = (req, res, next) => {
+  const deleteNotesSQL = {
+    text: "DELETE FROM notes WHERE notebook_id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteNotesSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(err);
+    }
+    return next();
+  });
+};
+
+//Delete corresponding skills when deleting a notebook
+notebookController.deleteSkillsForDeletingNotebook = (req, res, next) => {
+  const deleteSkillsSQL = {
+    text: "DELETE FROM skills WHERE notebook_id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteSkillsSQL, (error, response) => {
+    if (error) {
+      console.log(error);
+      return next(error);
+    }
+    return next();
+  });
+};
+
+//Delete corresponding reminders when deleting a notebook
+notebookController.deleteRemindersForDeletingNotebook = (req, res, next) => {
+  const deleteRemindersSQL = {
+    text: "DELETE FROM reminders WHERE notebook_id = ($1)",
+    values: [req.params.id],
+  };
+  db.query(deleteRemindersSQL, (error, response) => {
     if (error) {
       console.log(error);
       return next(error);
