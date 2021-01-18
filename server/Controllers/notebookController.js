@@ -77,7 +77,7 @@ notebookController.deleteNotebook = (req, res, next) => {
   db.query(deleteNotebookSQL, (error, response) => {
     if (error) {
       console.log(error);
-      return next(err);
+      return next(error);
     }
     return next();
   });
@@ -160,7 +160,7 @@ notebookController.deleteNotes = (req, res, next) => {
   db.query(deleteNotesSQL, (error, response) => {
     if (error) {
       console.log(error);
-      return next(err);
+      return next(error);
     }
     return next();
   });
