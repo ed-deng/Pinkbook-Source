@@ -1,6 +1,9 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+
+import Notebook from './Notebook.jsx';
+import Home from './Home.jsx';
 
 // Swtich: it searches through its children <Route> elements to find one whose path matches the current URL
 // One important thing to note is that a <Route path> matches the beginning of the URL, not the whole thing. So a <Route path="/"> will always match the URL. Because of this, we typically put this <Route> last in our <Switch>. Another possible solution is to use <Route exact path="/"> which does match the entire URL.
@@ -9,26 +12,25 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      navigation: [],
-      noteDetails: [],
+      notebookList: [],
     };
+    this.deleteSkillsCard = this.deleteSkillsCard.bind(this);
+  }
+
+  deleteSkillsCard(events, id) {
+    console.log(events);
+    console.log(id);
   }
 
   componentDidMount() {
-    fetch("/api")
+    //fetches all information on all notebooks
+    fetch('/api/')
       .then((res) => res.json())
-      .then((data) => this.setState({ navigation: data }));
+      .then((data) => this.setState({ notebookList: data }));
   }
 
-  // path={`${match.path}/:topicId`}>
-  // matchPath("/users/2", {
-  //   path: "/users/:id",
-  //   exact: true,
-  //   strict: true
-  // });
-
   render() {
-    const generateLinks = this.state.navigation.map((notebook) => {
+    const generateLinks = this.state.notebookList.map((notebook) => {
       const { _id: id, _id: reactKey, name } = notebook;
       console.log(id, name);
       return (
@@ -38,12 +40,28 @@ class App extends Component {
       );
     });
 
-    const generateNotebookRoutes = this.state.navigation.map((notebook) => {
-      const { _id: id, _id: reactKey, name } = notebook;
+    const generateNotebookRoutes = this.state.notebookList.map((notebook) => {
+      const {
+        _id: id,
+        _id: reactKey,
+        name,
+        description,
+        skills,
+        reminders,
+        notes,
+      } = notebook;
 
       return (
         <Route key={reactKey} path={`/${id}`}>
           <h1>{name}</h1>
+          <Notebook
+            id={id}
+            reactKey={reactKey}
+            description={description}
+            skills={skills}
+            reminders={reminders}
+            deleteSkillsCard={this.deleteSkillsCard}
+          />
         </Route>
       );
     });
@@ -67,10 +85,6 @@ class App extends Component {
       </div>
     );
   }
-}
-
-function Home() {
-  return <h2>Home Function</h2>;
 }
 
 export default App;
