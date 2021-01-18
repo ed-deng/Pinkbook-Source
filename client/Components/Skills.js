@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 const Skills = (props) => {
   const [skill, setSkill] = useState('');
   const [rating, setRanking] = useState('');
-  const [skillsList, setSkillsList] = useState([]);
 
   const handleSubmit = (e) => {
     console.log(props);

@@ -30,8 +30,7 @@ const Notes = (props) => {
   return (
     <div>
       <form>
-        <label>Notes</label>
-        <br></br>
+        <label><h2>Notes</h2></label>
         <textarea
           onChange={(e) => {
             setNotes(e.target.value);
