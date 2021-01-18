@@ -38,9 +38,13 @@ router.delete(
 );
 
 //GET REQUEST FOR ALL NOTES, SKILLS, REMINDERS
-
-router.get("/all", notebookController.allComponents, (req, res) =>
-  res.status(200).json(res.locals)
+router.get(
+  "/all",
+  notebookController.notebookDetails,
+  notebookController.notesDetails,
+  notebookController.skillsDetails,
+  notebookController.remindersDetails,
+  (req, res) => res.status(200).json(res.locals)
 );
 
 //Post request to add notes
