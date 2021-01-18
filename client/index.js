@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import App from './Components/App';
+import App from './Components/App.jsx';
 import './styles.css';
 
 // BrowserRouter/ Routers - Must wrap top-level <App> element inside a router
