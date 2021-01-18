@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
-import Notebook from './Notebook';
-import Home from './Home';
+import Notebook from './Notebook.jsx';
+import Home from './Home.jsx';
 
 // Swtich: it searches through its children <Route> elements to find one whose path matches the current URL
 // One important thing to note is that a <Route path> matches the beginning of the URL, not the whole thing. So a <Route path="/"> will always match the URL. Because of this, we typically put this <Route> last in our <Switch>. Another possible solution is to use <Route exact path="/"> which does match the entire URL.
@@ -13,15 +13,17 @@ class App extends Component {
     super(props);
     this.state = {
       notebookList: [],
-      // noteDetails: [],
     };
+    this.deleteSkillsCard = this.deleteSkillsCard.bind(this);
+  }
+
+  deleteSkillsCard(events, id) {
+    console.log(events);
+    console.log(id);
+
   }
 
   componentDidMount() {
-    // fetch('/api')
-    //   .then((res) => res.json())
-    //   .then((data) => this.setState({ notebookList: data }));
-
     //fetches all information on all notebooks
     fetch('/api/all')
       .then((res) => res.json())
@@ -47,7 +49,9 @@ class App extends Component {
         description,
         skills,
         reminders,
+        notes,
       } = notebook;
+
 
       return (
         <Route key={reactKey} path={`/${id}`}>
@@ -58,6 +62,7 @@ class App extends Component {
             description={description}
             skills={skills}
             reminders={reminders}
+            deleteSkillsCard={this.deleteSkillsCard}
           />
         </Route>
       );
