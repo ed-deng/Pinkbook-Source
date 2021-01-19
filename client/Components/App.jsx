@@ -13,40 +13,99 @@ class App extends Component {
     super(props);
     this.state = {
       notebookList: [],
+      count: 21,
     };
     this.deleteSkillsCard = this.deleteSkillsCard.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.submitChanges = this.submitChanges.bind(this);
   }
 
-  deleteSkillsCard(events, id) {
-    console.log(events);
-    console.log(id);
+  deleteSkillsCard(events, skillsid, notebook_id) {
+    fetch(`/api/skills/${skillsid}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    fetch("/api/all")
+      .then((res) => res.json())
+      .then((data) => this.setState({ notebookList: data }));
+    console.log(skillsid);
+    console.log(notebook_id);
+  }
+
+  handleSubmit(events, skill, rating, id) {
+    events.preventDefault();
+
+    fetch("/api/skills/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _id: this.state.count, //unique number
+        notebook_id: id,
+        name: skill,
+        rating: rating,
+      }),
+    });
+
+    fetch("/api/all")
+      .then((res) => res.json())
+      .then((data) => this.setState({ notebookList: data }));
+
+    this.setState({ count: this.state.count + 1 });
+  }
+
+  submitChanges(events, skill, rating, id, notebook_id) {
+    console.log("ID", id);
+    events.preventDefault();
+
+    fetch(`/api/skills/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        notebook_id,
+        name: skill,
+        rating: rating,
+      }),
+    });
+
+    fetch("/api/all")
+      .then((res) => res.json())
+      .then((data) => this.setState({ notebookList: data }));
   }
 
   componentDidMount() {
     //fetches all information on all notebooks
-    fetch("/api/")
+    fetch("/api/all")
       .then((res) => res.json())
       .then((data) => this.setState({ notebookList: data }));
   }
 
   render() {
+    console.log(this.state.notebookList);
+
     const generateLinks = this.state.notebookList.map((notebook) => {
       const {
-        notebook_id: id,
+        notebook_id,
         notebook_id: reactKey,
         notebook_name: name,
       } = notebook;
-      console.log(id, name);
+
+      // console.log(id, name);
       return (
         <li key={reactKey}>
-          <Link to={`/${id}`}>{name}</Link>
+          <Link to={`/${notebook_id}`}>{name}</Link>
         </li>
       );
     });
 
     const generateNotebookRoutes = this.state.notebookList.map((notebook) => {
       const {
-        notebook_id: id,
+        notebook_id,
         notebook_id: reactKey,
         notebook_name: name,
         description,
@@ -56,15 +115,17 @@ class App extends Component {
       } = notebook;
 
       return (
-        <Route key={reactKey} path={`/${id}`}>
+        <Route key={reactKey} path={`/${notebook_id}`}>
           <h1>{name}</h1>
           <Notebook
-            id={id}
+            notebook_id={notebook_id}
             reactKey={reactKey}
             description={description}
             skills={skills}
             reminders={reminders}
             deleteSkillsCard={this.deleteSkillsCard}
+            handleSubmit={this.handleSubmit}
+            submitChanges={this.submitChanges}
           />
         </Route>
       );
